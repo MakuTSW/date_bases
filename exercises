@@ -1,1 +1,167 @@
+/*zad1
+select * from Customers
+where Country = 'Poland' or Country = 'Germany'
+*/
 
+/* zad2
+select * from Customers
+where CompanyName like 'N%' or CompanyName like 'C%'
+*/
+
+/* zad3
+select * from Products
+join Categories on products.CategoryID=Categories.CategoryID
+where CategoryName like 'C%'
+*/
+
+-- zad4
+select 	orders.OrderID,	OrderDate,	[Order Details].ProductID,	
+ProductName, [Order Details].UnitPrice,	Quantity,	CategoryName,	orders.CustomerID,	
+CompanyName from Orders
+join [Order Details] on [Order Details].OrderID=Orders.OrderID
+join Customers on Customers.CustomerID=Orders.CustomerID
+join Products on [Order Details].ProductID=Products.ProductID
+join Categories on Categories.CategoryID=Products.CategoryID
+
+/* zad5
+select * from Customers
+where Region is NULL
+*/
+
+/* zad6
+Select Distinct(Country) from Customers
+*/
+
+/*zad7
+select * from Products
+join Categories on Categories.CategoryID=Products.CategoryID
+where UnitPrice >= 20 and UnitPrice<=30 and CategoryName='Beverages'
+*/
+
+/*zad8
+select * from Customers
+left join orders on orders.CustomerID=Customers.CustomerID
+where OrderID is null
+*/
+
+/*zad9
+select * from Customers
+where CustomerID not in (select CustomerID from orders)
+*/
+
+/*zad10
+select * from Customers
+where not exists (select CustomerID from orders where orders.CustomerID=Customers.CustomerID)
+*/
+
+/* zad11
+select Country,count(Country) from Customers
+where Country = 'Germany' or Country = 'Poland'
+group by Country
+*/
+
+/*zad12
+select count(distinct(country)) from Customers
+*/
+
+/* zad13
+select OrderDate,Count(OrderID) from Orders
+group by OrderDate
+*/
+
+/* zad14
+select categories.categoryid,count(categories.CategoryID) from Categories
+join Products on products.categoryid=categories.categoryid 
+join [Order Details] on products.productid=[Order Details].ProductID
+join Orders on [Order Details].OrderID=Orders.OrderID
+group by categories.CategoryID
+*/
+
+--zad 15
+select [Order Details].ProductID,count(CustomerID) from Orders
+join [Order Details] on [Order Details].OrderID=orders.OrderID
+join Products on [Order Details].ProductID=Products.ProductID
+group by  [Order Details].ProductID
+order by [Order Details].ProductID
+
+--zad 16
+select categoryname,max(UnitPrice),min(UnitPrice) from Products
+join Categories on Categories.CategoryID=Products.CategoryID
+where UnitPrice>30
+group by Categoryname
+
+--zad17
+select orderDate,SUM(ROUND(UnitPrice*Quantity*CAST((1-Discount) AS MONEY),2)) from orders
+join [Order Details] on orders.Orderid=[Order Details].OrderID
+group by orderDate
+order by OrderDate
+
+--zad 18
+select OrderDate,productid,SUM(ROUND(UnitPrice*Quantity*CAST((1-Discount) AS MONEY),2)) from orders
+join [Order Details] on orders.Orderid=[Order Details].OrderID
+group by productid,OrderDate
+
+--zad19
+select top 1 customerid from orders
+join [Order Details] on [Order Details].OrderID=Orders.OrderID
+group by customerid
+order by SUM(ROUND(UnitPrice*Quantity*CAST((1-Discount) AS MONEY),2)) desc
+
+--zad 20
+select * from Customers
+where customerid=(
+select top 1 customerid from orders
+join [Order Details] on [Order Details].OrderID=Orders.OrderID
+group by customerid
+order by SUM(ROUND(UnitPrice*Quantity*CAST((1-Discount) AS MONEY),2)) desc)
+
+--zad 21
+select categoryname,max(UnitPrice),min(UnitPrice) from Products
+join Categories on Products.CategoryID=Categories.CategoryID
+group by CategoryName
+
+--zad 22
+select top 3 unitprice from Products
+order by unitprice desc 
+
+--zad 23
+SELECT	MAX(UnitPrice)	FROM	Products
+UNION
+SELECT	MAX(UnitPrice)	FROM	Products
+where UnitPrice!=(select max(unitprice) from products)
+union 
+select max(unitprice) from Products
+where unitprice!=(select max(unitprice) from products) 
+and unitprice!=(
+SELECT	MAX(UnitPrice)	FROM	Products
+where UnitPrice!=(select max(unitprice) from products))
+
+--zad24
+-- 500,400,300
+
+
+--zad 25
+SELECT	MAX(A.unitprice),	MAX(B.unitprice),	MAX(C.unitprice)
+FROM	products	AS	A,	products	AS	B,	Products	AS	C
+WHERE	(A.unitprice>B.unitprice)	AND	(B.unitprice>C.unitprice)
+
+--zad 26
+--wypisze 3 najwieksze stawki z tabeli procownicy
+
+--zad 27
+select distinct unitprice from Products
+where unitprice>=
+(select max(unitprice) from Products
+where unitprice < (select max(unitprice) from Products
+where unitprice < (select max(unitprice) from Products)))
+
+--zad 28
+-- wypisuje z tabelki pracownicy stawki ktore sa mniejsze od maksymalnie 2 innych stawek,
+-- wiec sa to 3 najwieksze stawki
+
+-- zad 29
+SELECT DISTINCT COUNT(*), A.UnitPrice
+FROM Products A, Products B
+WHERE (A.UnitPrice <= B.UnitPrice)
+GROUP BY A.UnitPrice
+HAVING COUNT(*) <= 3
